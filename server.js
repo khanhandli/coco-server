@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
     cors({
-        origin: [`${process.env.BASE_URL}`, 'http://www.cocoshopclient.tk'],
+        origin: [`${process.env.BASE_URL}`, 'https://cocoshopclient.tk'],
         credentials: true,
     })
 );
