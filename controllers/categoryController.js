@@ -4,29 +4,30 @@ import Categories from '../models/categoryModel.js';
 const categoryController = {
     get: async (req, res) => {
         try {
-            const feature = new APIFeature(Categories.find().populate('parent'), req.query)
-                .sorting()
-                .filtering()
-                .paginating();
-
-            const categories = await feature.query;
+            const categories = await Categories.find().populate('parent');
 
             const list = categories.map((category) => {
-                // filter category parent and add children to category
                 if (!category._doc.parent) {
                     return {
                         ...category._doc,
+                        title: category._doc.name,
                         key: category._doc._id.toString(),
-                        children: categories.filter(
-                            (c) => c._doc?.parent?._id.toString() == category._doc?._id.toString()
-                        ),
+                        children: categories
+                            .filter((c) => c._doc?.parent?._id.toString() == category._doc?._id.toString())
+                            .map((item) => {
+                                return {
+                                    ...item._doc,
+                                    title: item._doc.name,
+                                    key: item._doc._id.toString(),
+                                };
+                            }),
                     };
                 }
             });
 
             const listFilter = list.filter((c) => c);
             listFilter.forEach((c) => {
-                if (!(c.children.length > 0)) {
+                if (!(c?.children?.length > 0)) {
                     delete c['children'];
                 }
             });
@@ -38,12 +39,13 @@ const categoryController = {
     },
     getAllCategory: async (req, res) => {
         try {
-            const feature = new APIFeature(Categories.find().populate('parent'), req.query)
-                .sorting()
-                .filtering()
-                .paginating();
+            // const feature = new APIFeature(Categories.find().populate('parent'), req.query)
+            //     .sorting()
+            //     .filtering()
+            //     .paginating();
 
-            const categories = await feature.query;
+            // const categories = await feature.query;
+            const categories = await Categories.find().populate('parent');
             res.status(200).json(categories);
         } catch (err) {
             return res.status(500).json({ msg: err.message });

@@ -3,7 +3,7 @@ import productModel from '../models/productModel.js';
 const productController = {
     get: async (req, res) => {
         try {
-            const product = await productModel.find();
+            const product = await productModel.find().populate('category');
             res.status(200).json(product);
         } catch (err) {
             return res.status(500).json({ msg: err.message });

@@ -5,6 +5,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import routes from './routes/index.js';
 import { createServer } from 'http';
+import bodyParser from 'body-parser';
+
 // import { Server, Socket } from "socket.io";
 
 const app = express();
@@ -15,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
     cors({
-        origin: [`${process.env.BASE_URL}`, 'https://cocoshopclient.tk'],
+        origin: [`${process.env.BASE_URL}`, 'https://cocoshopadmin.tk'],
         credentials: true,
     })
 );
