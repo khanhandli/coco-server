@@ -1,9 +1,11 @@
 import productModel from '../models/productModel.js';
+import Payments from '../models/paymentModel.js';
+import Users from '../models/userModel.js';
 
 const productController = {
     get: async (req, res) => {
         try {
-            const product = await productModel.find().populate('category');
+            const product = await productModel.find().populate('category').populate('promotion');
             res.status(200).json(product);
         } catch (err) {
             return res.status(500).json({ msg: err.message });
@@ -48,6 +50,44 @@ const productController = {
                 message: 'Error while deleting product',
                 error: error,
             });
+        }
+    },
+    reportStatistics: async (req, res) => {
+        try {
+            const products = await productModel.find({
+                createdAt: {
+                    $gte: new Date(req.body.startDate),
+                    $lte: new Date(req.body.endDate),
+                },
+            });
+            const payments = await Payments.find({
+                createdAt: {
+                    $gte: new Date(req.body.startDate),
+                    $lte: new Date(req.body.endDate),
+                },
+            });
+
+            const users = await Users.find({
+                createdAt: {
+                    $gte: new Date(req.body.startDate),
+                    $lte: new Date(req.body.endDate),
+                },
+            });
+
+            const history = await Payments.find({
+                createdAt: {
+                    $gte: new Date(req.body.startDate),
+                    $lte: new Date(req.body.endDate),
+                },
+            });
+
+            const history_ = history.map((item) => {
+                return item.cart;
+            });
+
+            res.status(200).json({ products, payments, users, history_ });
+        } catch (err) {
+            return res.status(500).json({ msg: err.message });
         }
     },
 };

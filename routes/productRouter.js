@@ -12,4 +12,6 @@ router
     .put(productController.update)
     .delete(productController.delete);
 
+router.route('/product/report').post(productController.reportStatistics);
+
 export default router;

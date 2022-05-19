@@ -1,7 +1,7 @@
 import Users from '../models/userModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-// import Payments from '../models/paymentModel';
+import Payments from '../models/paymentModel.js';
 import sendMail from './sendMail.js';
 
 import { google } from 'googleapis';
@@ -273,6 +273,23 @@ const userController = {
             return res.status(500).json({ msgerr: err.message });
         }
     },
+    addShipping: async (req, res) => {
+        try {
+            const user = await Users.findById(req.user.id);
+            if (!user) return res.status(400).json({ msg: 'User không tồn tại.' });
+
+            await Users.findOneAndUpdate(
+                { _id: req.user.id },
+                {
+                    shipping: req.body.shipping,
+                }
+            );
+
+            return res.json({ msg: 'Thêm vào giỏ hàng.' });
+        } catch (err) {
+            return res.status(500).json({ msgerr: err.message });
+        }
+    },
     addFavorite: async (req, res) => {
         try {
             const user = await Users.findById(req.user.id);
@@ -290,15 +307,54 @@ const userController = {
             return res.status(500).json({ msgerr: err.message });
         }
     },
-    // history: async (req, res) => {
-    //     try {
-    //         const history = await Payments.find({ user_id: req.user.id });
+    history: async (req, res) => {
+        try {
+            const history = await Payments.find({ user_id: req.user.id });
+            const { type } = req.query;
 
-    //         res.json(history);
-    //     } catch (err) {
-    //         return res.status(500).json({ msgerr: err.message });
-    //     }
-    // },
+            let returnHistory;
+
+            // remove key detail from cart in history
+            const history_ = history.map((item) => {
+                // remove key detail from cart in item
+                const item_ = {
+                    ...item._doc,
+                    cart: item.cart.map((carts) => {
+                        return {
+                            ...carts,
+                            detail: undefined,
+                            key: carts._id + Math.random().toString(),
+                            id_product: item._doc._id,
+                        };
+                    }),
+                };
+
+                return item_;
+            });
+
+            if (type == 1) {
+                // remove cart from history
+                returnHistory = history_.map((item) => {
+                    return {
+                        ...item,
+                        key: item._id,
+                        cart: undefined,
+                    };
+                });
+            } else {
+                returnHistory = history_.map((item) => {
+                    return item.cart;
+                });
+
+                // flat returnHistory
+                returnHistory = [].concat(...returnHistory);
+            }
+
+            res.json(returnHistory);
+        } catch (err) {
+            return res.status(500).json({ msgerr: err.message });
+        }
+    },
     googleLogin: async (req, res) => {
         try {
             const { tokenId } = req.body;
@@ -428,7 +484,7 @@ const createActivationToken = (payload) => {
 };
 
 const createAccessToken = (payload) => {
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '60m' });
 };
 
 const createRefreshToken = (payload) => {

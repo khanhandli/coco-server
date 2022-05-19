@@ -21,9 +21,11 @@ router.get('/inforUser', auth, userController.getUserInfor);
 
 router.patch('/addcart', auth, userController.addCart);
 
+router.patch('/addship', auth, userController.addShipping);
+
 router.patch('/addFavorite', auth, userController.addFavorite);
 
-// router.get('/history', auth, userController.history);
+router.get('/history', auth, userController.history);
 
 router.post('/forgot', userController.forgotPassword);
 
