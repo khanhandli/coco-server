@@ -1,5 +1,7 @@
 import express from 'express';
+import commentCtrl from '../controllers/commentController.js';
 import userController from '../controllers/userController.js';
+import notificationController from '../controllers/notificationController.js';
 import auth from '../middleware/auth.js';
 import authAdmin from '../middleware/authAdmin.js';
 
@@ -22,6 +24,9 @@ router.get('/inforUser', auth, userController.getUserInfor);
 router.patch('/addcart', auth, userController.addCart);
 
 router.patch('/addship', auth, userController.addShipping);
+
+router.patch('/avatar', auth, userController.updateAvatar);
+router.patch('/setting', auth, userController.updateUser);
 
 router.patch('/addFavorite', auth, userController.addFavorite);
 
@@ -47,5 +52,11 @@ router.delete('/delete/:id', auth, authAdmin, userController.deleteUser);
 router.post('/google_login', userController.googleLogin);
 
 router.post('/facebook_login', userController.facebookLogin);
+
+// comment
+router.get('/comments/:id', commentCtrl.getComments);
+
+// notification
+router.get('/notification', notificationController.getNotis);
 
 export default router;

@@ -1,6 +1,8 @@
 import productModel from '../models/productModel.js';
 import Payments from '../models/paymentModel.js';
 import Users from '../models/userModel.js';
+import Notifications from '../models/notificationModel.js';
+import { handleTitleNotification } from '../config/common.js';
 
 const productController = {
     get: async (req, res) => {
@@ -86,6 +88,30 @@ const productController = {
             });
 
             res.status(200).json({ products, payments, users, history_ });
+        } catch (err) {
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    reviews: async (req, res) => {
+        try {
+            const { rating } = req.body;
+            if (rating && rating !== 0) {
+                const product = await productModel.findById(req.params.id);
+                if (!product) return res.status(400).json({ msg: 'Sản Phẩm Không Tồn Tại.' });
+
+                let num = product.numReviewers;
+                let rate = product.rating;
+
+                await productModel.findOneAndUpdate(
+                    { _id: req.params.id },
+                    {
+                        rating: rate + rating,
+                        numReviewers: num + 1,
+                    }
+                );
+
+                res.json({ msg: 'Cập nhật thành công' });
+            }
         } catch (err) {
             return res.status(500).json({ msg: err.message });
         }

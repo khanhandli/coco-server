@@ -290,6 +290,29 @@ const userController = {
             return res.status(500).json({ msgerr: err.message });
         }
     },
+    updateUser: async (req, res) => {
+        try {
+            const user = await Users.findById(req.user.id);
+            if (!user) return res.status(400).json({ msg: 'User không tồn tại.' });
+            const { name, description, name_ship, phone_ship, address_ship } = req.body;
+
+            await Users.findOneAndUpdate(
+                { _id: req.user.id },
+                {
+                    name,
+                    description,
+                    shipping: {
+                        name: name_ship,
+                        phone: phone_ship,
+                        address: address_ship,
+                    },
+                }
+            );
+            res.json({ msg: 'Cập nhật thành công!' });
+        } catch (err) {
+            return res.status(500).json({ msg: err.message });
+        }
+    },
     addFavorite: async (req, res) => {
         try {
             const user = await Users.findById(req.user.id);
@@ -351,6 +374,23 @@ const userController = {
             }
 
             res.json(returnHistory);
+        } catch (err) {
+            return res.status(500).json({ msgerr: err.message });
+        }
+    },
+    updateAvatar: async (req, res) => {
+        try {
+            const user = await Users.findById(req.user.id);
+            if (!user) return res.status(400).json({ msg: 'User không tồn tại.' });
+
+            await Users.findOneAndUpdate(
+                { _id: req.user.id },
+                {
+                    avatar: req.body.avatar,
+                }
+            );
+
+            return res.json({ msg: 'Cập nhật avatar thành công.' });
         } catch (err) {
             return res.status(500).json({ msgerr: err.message });
         }

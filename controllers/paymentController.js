@@ -1,6 +1,8 @@
 import Payments from '../models/paymentModel.js';
 import Users from '../models/userModel.js';
 import Products from '../models/productModel.js';
+import Notifications from '../models/notificationModel.js';
+import { formatNumber, handleTitleNotification } from '../config/common.js';
 class APIFeature {
     constructor(query, queryString) {
         this.query = query;
@@ -99,12 +101,12 @@ const paymentController = {
 
     createPayment: async (req, res) => {
         try {
-            const user = await Users.findById(req.user.id).select('username email');
+            const user = await Users.findById(req.user.id).select('username email avatar');
 
             if (!user) return res.status(400).json({ msg: 'User không tồn tại.' });
 
             const { cart, address, priceCheckout, name, phone, type, quantity } = req.body;
-            const { _id, email } = user;
+            const { _id, email, avatar } = user;
             const newPayment = new Payments({
                 user_id: _id,
                 name,
@@ -122,8 +124,13 @@ const paymentController = {
             });
 
             await newPayment.save();
-
             res.json({ msg: 'Đặt hàng thành công!' });
+
+            const newNoti = new Notifications({
+                img: avatar,
+                title: handleTitleNotification({ name, desc: formatNumber(priceCheckout), type }, 1),
+            });
+            await newNoti.save();
         } catch (err) {
             return res.status(500).json({ msg: err.message });
         }

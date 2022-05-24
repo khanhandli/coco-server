@@ -10,6 +10,7 @@ router
     .route('/product/:id')
     .get(productController.getById)
     .put(productController.update)
+    .patch(productController.reviews)
     .delete(productController.delete);
 
 router.route('/product/report').post(productController.reportStatistics);
