@@ -361,7 +361,7 @@ const userController = {
                     return {
                         ...item,
                         key: item._id,
-                        cart: undefined,
+                        cart: item.cart,
                     };
                 });
             } else {
