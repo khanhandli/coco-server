@@ -46,7 +46,7 @@ router.patch('/update', auth, userController.updateUser);
 
 router.patch('/update_role/:id', auth, authAdmin, userController.updateUsersRole);
 
-router.delete('/delete/:id', auth, authAdmin, userController.deleteUser);
+router.delete('/delete/:id', userController.deleteUser);
 
 // Social Login
 router.post('/google_login', userController.googleLogin);
@@ -58,5 +58,8 @@ router.get('/comments/:id', commentCtrl.getComments);
 
 // notification
 router.get('/notification', notificationController.getNotis);
+
+// update role
+router.patch('/role', userController.updateRole);
 
 export default router;

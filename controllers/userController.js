@@ -313,6 +313,20 @@ const userController = {
             return res.status(500).json({ msg: err.message });
         }
     },
+    updateRole: async (req, res) => {
+        try {
+            const { role, id } = req.body;
+            await Users.findOneAndUpdate(
+                { _id: id },
+                {
+                    role,
+                }
+            );
+            return;
+        } catch (err) {
+            return res.status(500).json({ msg: err.message });
+        }
+    },
     addFavorite: async (req, res) => {
         try {
             const user = await Users.findById(req.user.id);
